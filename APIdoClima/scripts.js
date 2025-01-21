@@ -13,6 +13,13 @@ const humidityElement = document.querySelector("#humidity span");
 const windElement = document.querySelector("#wind span");
 
 const weatherContainer = document.querySelector("#weather-data");
+const mapContainer = document.querySelector("#map");
+
+let map; 
+let marker; 
+
+weatherContainer.style.display = "none";
+mapContainer.style.display = "none";
 
 const getWeatherData = async (city) => {
     const apiWeatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=pt_br`;
@@ -27,28 +34,56 @@ const showWeatherData = async (city) => {
     const data = await getWeatherData(city);
 
     const countryCode = data.sys.country; 
-
+    const lat = data.coord.lat;
+    const lon = data.coord.lon; 
     cityElement.innerText = data.name;
     tempElement.innerText = parseInt(data.main.temp);
     descElement.innerText = data.weather[0].description;
     weatherIconElement.setAttribute("src", `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
-    countryElement.setAttribute("src", `${apiCountryUrl}${countryCode}/flat/64.png`); 
+    countryElement.setAttribute("src", `${apiCountryUrl}${countryCode}/flat/64.png`);
     humidityElement.innerText = `${data.main.humidity}%`;
     windElement.innerText = `${data.wind.speed}km/h`;
 
-    weatherContainer.classList.remove("hide");
+    weatherContainer.style.display = "block";
+    mapContainer.style.display = "block";
+
+    showMap(lat, lon);
+};
+
+const showMap = (lat, lon) => {
+    if (map) {
+        map.remove();
+    }
+
+    map = L.map('map').setView([lat, lon], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    if (marker) {
+        marker.remove();
+    }
+
+    marker = L.marker([lat, lon]).addTo(map)
+        .bindPopup(`Cidade: ${cityElement.innerText}`)
+        .openPopup();
 };
 
 searchBtn.addEventListener("click", (e) => {
     e.preventDefault();
 
     const city = cityInput.value;
-    showWeatherData(city);
+    if (city) {
+        showWeatherData(city);
+    }
 });
 
 cityInput.addEventListener("keyup", (e) => {
     if (e.code === "Enter") {
         const city = e.target.value;
-        showWeatherData(city);
+        if (city) {
+            showWeatherData(city);
+        }
     }
 });
