@@ -28,4 +28,3 @@ A RESTful API built with ASP.NET Core 7.0 for retrieving real-time weather data 
 - **appsettings.json**: Stores configuration such as API base URLs, logging, or default values.
 - **appsettings.Development.json**: Overrides base settings for development purposes; useful for secrets like API keys.
 - **Program.cs**: Configures application services, middleware pipeline, and starts the application.
-- **README.md**: Documentation explaining the purpose, setup, and usage of the project.
